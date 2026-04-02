@@ -25,10 +25,12 @@
       html,
       body {
         margin: 0;
-        min-height: 100%;
+        height: 100%;
+        overflow: hidden;
         font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
         background: linear-gradient(180deg, var(--bg1) 0%, var(--bg2) 48%, var(--bg3) 100%);
         color: var(--text);
+        overscroll-behavior: none;
       }
 
       body {
@@ -46,15 +48,16 @@
       .app {
         width: 100%;
         max-width: 460px;
-        min-height: 100vh;
-        padding: 16px;
+        height: 100dvh;
+        padding: 12px 12px calc(12px + env(safe-area-inset-bottom));
       }
 
       .topbar {
         display: flex;
         align-items: center;
         gap: 12px;
-        margin-bottom: 14px;
+        margin-bottom: 10px;
+        padding-top: env(safe-area-inset-top);
       }
 
       .logo {
@@ -94,27 +97,41 @@
 
       .card {
         position: relative;
-        min-height: calc(100vh - 98px);
+        height: calc(100dvh - 86px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
         border-radius: 34px;
         background: var(--card);
         border: 1px solid var(--card-border);
         box-shadow: var(--shadow);
         backdrop-filter: blur(18px);
         -webkit-backdrop-filter: blur(18px);
-        padding: 16px;
+        padding: 14px;
         overflow: hidden;
       }
 
       .screen {
-        min-height: calc(100vh - 130px);
+        height: 100%;
         display: none;
         flex-direction: column;
-        justify-content: space-between;
+        min-height: 0;
         animation: fadeUp 0.28s ease;
       }
 
       .screen.active {
         display: flex;
+      }
+
+      .home-screen {
+        justify-content: flex-start;
+        gap: 18px;
+      }
+
+      .camera-screen,
+      .result-screen {
+        justify-content: space-between;
+      }
+
+      .analyzing-screen {
+        justify-content: center;
       }
 
       .pill {
@@ -178,6 +195,10 @@
         gap: 14px;
       }
 
+      .home-actions {
+        margin-top: 2px;
+      }
+
       .primary-btn,
       .secondary-btn {
         border: 0;
@@ -232,7 +253,8 @@
       }
 
       .video-wrap {
-        min-height: 430px;
+        min-height: 0;
+        height: 100%;
         flex: 1;
       }
 
@@ -459,7 +481,27 @@
       @media (max-width: 390px) {
         .card {
           border-radius: 28px;
+          padding: 12px;
         }
+
+        h1 {
+          font-size: 30px;
+        }
+
+        .hero-title,
+        h2 {
+          font-size: 28px;
+        }
+
+        .video-wrap {
+          min-height: 0;
+        }
+
+        .primary-btn,
+        .secondary-btn {
+          padding: 14px 16px;
+        }
+      }
 
         h1 {
           font-size: 30px;
@@ -488,7 +530,7 @@
       </div>
 
       <div class="card">
-        <section id="homeScreen" class="screen active">
+        <section id="homeScreen" class="screen active home-screen">
           <div class="section-stack">
             <div class="pill">✨ Détection tigresque avancée</div>
             <div class="hero-box section-stack">
@@ -499,15 +541,14 @@
               </p>
               <p class="tiny muted">Les 3 premiers essais ont plus de chances de révéler un tigre spécial.</p>
             </div>
-          </div>
-
-          <div class="section-stack">
-            <button id="startBtn" class="primary-btn">TIGRE</button>
+            <div class="home-actions">
+              <button id="startBtn" class="primary-btn">TIGRE</button>
+            </div>
             <div id="errorBox" class="error-box" style="display: none"></div>
           </div>
         </section>
 
-        <section id="cameraScreen" class="screen">
+        <section id="cameraScreen" class="screen camera-screen">
           <div class="section-stack" style="flex: 1">
             <div class="top-row">
               <div>
@@ -529,7 +570,7 @@
           </div>
         </section>
 
-        <section id="analyzingScreen" class="screen" style="justify-content: center; text-align: center">
+        <section id="analyzingScreen" class="screen analyzing-screen" style="text-align: center">
           <div>
             <div class="spinner"></div>
             <h2 style="font-size: 30px">Analyse tigresque</h2>
@@ -540,7 +581,7 @@
           </div>
         </section>
 
-        <section id="resultScreen" class="screen">
+        <section id="resultScreen" class="screen result-screen">
           <div class="special-overlay" id="specialOverlay">
             <div id="specialGlow" class="special-glow"></div>
             <div id="particles"></div>
@@ -581,86 +622,186 @@
 
     <script>
       const funnyCountries = [
-        "Franchat",
-        "Belgiquou",
-        "Tigralie",
-        "Mexichat",
-        "Japongrrr",
-        "Canadou",
-        "Brésilou",
-        "Itatigre",
-        "Marocroc",
-        "Espagrrrne",
-        "Argentigre",
-        "Indigrrre",
-        "Turgrrie",
-        "Chagrre",
-        "Portugrrral",
-        "Norvroum",
-        "Suissou",
-        "Camerounet",
-        "Tunigrrre",
-        "Algérrrire",
-        "Tigrlande",
-        "Sénégrawl",
-        "Croagrrre",
-        "Hongrugrrre",
-        "Finlagnou",
-        "Danigrrrk",
-        "Tanzanigre",
-        "Kenyagrrr",
-        "Tigrafrique du Sud",
-        "Pérougarou",
-        "Chiligrre",
-        "Bolitigre",
-        "Urugrrray",
-        "Paragrrray",
-        "Colombraw",
-        "Costarugrrra",
-        "Panamiaou",
-        "Guatigrre",
-        "Vietgrrrnam",
-        "Thaïtigre",
-        "Malaiscratch",
-        "Indonégrrrsie",
-        "Philigrrrines",
-        "Corégrrre du Sud",
-        "Tigrapour",
-        "Néozégrrrlande",
-        "Groengrrrland",
-        "Islandou",
-        "Monacraw",
-        "Luxemburgrrr",
-        "Autrichat",
-        "Grecrouh",
-        "Roumignou",
-        "Bulgrrrare",
-        "Serbigrrre",
-        "Tchétigrrre",
-        "Kazagrrrstan",
-        "Mongrrrolie",
-        "Népalou",
-        "Bhoutigrrran",
-        "Sri Lankraw",
-        "Madagrrrscar",
-        "Nigrrria",
-        "Ghanagrrre",
-        "Bostigrrrwana",
-        "Namibraw",
-        "Ougrrranda"
+        "Franchistan de la raclette",
+        "Belgigolosse",
+        "Tigralie du barbecue cosmique",
+        "Mexicharrrd",
+        "Japongrrr Turbo",
+        "Canadoudou Prime",
+        "Brésilavion",
+        "Itapizza del tigro",
+        "Marocroc Max",
+        "Espagrriotte",
+        "Argentigroland",
+        "Indigrrrmédiaire",
+        "Turquouic",
+        "Chagrrovia",
+        "Portugrololo",
+        "Norvroum 2",
+        "Suissatory",
+        "Camerounch",
+        "Tunivroum",
+        "Algérrrizon",
+        "Tigrlande Édition Limitée",
+        "Sénégrawl Ultra",
+        "Croagrrre 4K",
+        "Hongrurie de la sauce",
+        "Finlande mais en plus tigre",
+        "Danemark Zuckerberg",
+        "Tanzanigrrre",
+        "Kenyarrrgh",
+        "Tigrafrique du Sud Deluxe",
+        "Pérougarou V2",
+        "Chilichat Pro Max",
+        "Bolitigre XP",
+        "Urugrrray Sigma",
+        "Paragrrray DLC",
+        "Colombraw Studio",
+        "Costagriffe Rica",
+        "Panamiaou Stories",
+        "Guatigrre Électrique",
+        "Vietgrrrrnam Director's Cut",
+        "Thaïtigre Supreme",
+        "Malaiscratch Hardcore",
+        "Indonégrrrsie Remix",
+        "Philigrrrines en WiFi",
+        "Corégrrr du Sud mais drôle",
+        "Tigrapour Business Class",
+        "Néozégrrrlande de l'aura",
+        "Groengrrrland chaud",
+        "Islandou Plus",
+        "Monacraw Prestige",
+        "Luxemburgrrr Premium",
+        "Autrichat.exe",
+        "Grecrouh Antique",
+        "Roumignou Turbo",
+        "Bulgrrrare de la night",
+        "Serbigrrre Academy",
+        "Tchétigrrre HD",
+        "Kazagrrrstan Drift",
+        "Mongrrrolie Mobile",
+        "Népalou Pocket",
+        "Bhoutigrrran Infinity",
+        "Sri Lankraw Gold",
+        "Madagrrrscar Origins",
+        "Nigrrria Battle Pass",
+        "Ghanagriffe",
+        "Bostigrrrwana Max",
+        "Namibraw Ultra",
+        "Ougrrranda Cinematic Universe",
+        "Ohio des tigres",
+        "Baguettistan Quantique",
+        "Croissantie Sauvage",
+        "Sardinavie Royale",
+        "Rizotto-sur-Grrr",
+        "Wakandou du dimanche",
+        "Molduvie du rugissement",
+        "Pamplemoussie Centrale"
       ];
 
       const specialTigerTypes = [
-        { name: "Roi des Tigres", weight: 1, description: "niveau absolument absurde. Apparition ultra rare.", badge: "Légende vivante", ultra: true },
-        { name: "Tigre Golden", weight: 6, description: "brille un peu trop pour rester discret.", badge: "Tigre spécial", ultra: false },
-        { name: "Tigre Bungalaw", weight: 3, description: "rare, mystérieux, et légèrement dramatique.", badge: "Tigre spécial", ultra: false },
-        { name: "Tigre Turbo", weight: 5, description: "impossible à suivre quand il commence à bouger.", badge: "Tigre spécial", ultra: false },
-        { name: "Tigre Céleste", weight: 4, description: "regard légendaire, aura suspectement majestueuse.", badge: "Tigre spécial", ultra: false },
-        { name: "Tigre de Minuit", weight: 4, description: "élégant, discret, un peu trop stylé.", badge: "Tigre spécial", ultra: false },
-        { name: "Tigre Suprême", weight: 2, description: "fait peur aux autres tigres sans même essayer.", badge: "Tigre spécial", ultra: false },
-        { name: "Tigre Volt", weight: 4, description: "chargé en énergie orange non homologuée.", badge: "Tigre spécial", ultra: false },
-        { name: "Tigre Comète", weight: 3, description: "arrive vite, repart avec panache.", badge: "Tigre spécial", ultra: false },
-        { name: "Tigre Mirage", weight: 3, description: "on le voit, puis on doute d'avoir eu le droit de le voir.", badge: "Tigre spécial", ultra: false }
+        {
+          name: "Roi des Tigres",
+          weight: 1,
+          description: "Tu n'es plus dans la chaîne alimentaire, tu es dans les crédits de fin. Même les boss de fin te vouvoient.",
+          badge: "Légende vivante",
+          ultra: true
+        },
+        {
+          name: "Tigre Golden Croissant RTX",
+          weight: 6,
+          description: "Brille comme un skin légendaire tombé à 3h du matin. Aura 200%, logique 0%, respect automatique.",
+          badge: "Tigre spécial",
+          ultra: false
+        },
+        {
+          name: "Tigre Bungalaw du Multivers",
+          weight: 3,
+          description: "On ne sait pas ce que ça veut dire, mais ça sonne comme un personnage secret débloqué en mangeant trois pains au chocolat d'affilée.",
+          badge: "Tigre spécial",
+          ultra: false
+        },
+        {
+          name: "Tigre Sigma Andalouse",
+          weight: 5,
+          description: "Entre dans la pièce en mode edit CapCut. Musique dramatique, ralenti, et tout le monde perd 14 points de charisme.",
+          badge: "Tigre spécial",
+          ultra: false
+        },
+        {
+          name: "Tigre Céleste WiFi 7",
+          weight: 4,
+          description: "Connexion directe avec les étoiles et probablement avec la box du voisin. Charisme stable, ping instable.",
+          badge: "Tigre spécial",
+          ultra: false
+        },
+        {
+          name: "Tigre de Minuit Version DLC",
+          weight: 4,
+          description: "Sort uniquement quand tout le monde dort. Vibes de PNJ légendaire dans une ruelle avec néons violets.",
+          badge: "Tigre spécial",
+          ultra: false
+        },
+        {
+          name: "Tigre Suprême Sauce Samouraï",
+          weight: 2,
+          description: "Trop puissant pour être équilibré. On aurait dû le patch en 1.0.4 mais il a refusé la mise à jour.",
+          badge: "Tigre spécial",
+          ultra: false
+        },
+        {
+          name: "Tigre Volt Carrefour Market",
+          weight: 4,
+          description: "Énergie illégale. Peut recharger un iPhone, une trottinette, et la confiance d'un groupe entier juste en regardant fort.",
+          badge: "Tigre spécial",
+          ultra: false
+        },
+        {
+          name: "Tigre Comète Ohio Max Pro",
+          weight: 3,
+          description: "Passe à toute vitesse, laisse une traînée de feu et une odeur de mème incompréhensible. Très Ohio, très regrettable.",
+          badge: "Tigre spécial",
+          ultra: false
+        },
+        {
+          name: "Tigre Mirage Skibidi Premium",
+          weight: 3,
+          description: "Tu le vois, tu doutes, puis tu te demandes si ton cerveau n'a pas ouvert 38 onglets tout seul.",
+          badge: "Tigre spécial",
+          ultra: false
+        },
+        {
+          name: "Tigre Baguette Quantique",
+          weight: 3,
+          description: "À la fois croustillant et interdimensionnel. Existe simultanément en France, dans l'espace et dans un TikTok de 9 secondes.",
+          badge: "Tigre spécial",
+          ultra: false
+        },
+        {
+          name: "Tigre Banane Administrative",
+          weight: 2,
+          description: "Aucun sens, zéro contexte, mais une autorité terrifiante. Même les formulaires se remplissent tout seuls devant lui.",
+          badge: "Tigre spécial",
+          ultra: false
+        }
+      ];
+
+      const countrySubtitles = [
+        "Espèce locale officiellement approuvée par un comité composé de trois cousins, un streamer et une frite froide.",
+        "Ton aura a été validée par la jungle, par internet, et par un gars en commentaire qui a écrit 'masterclass'.",
+        "Tu as l'énergie d'un héros secondaire devenu principal par accident, et franchement ça fonctionne trop bien.",
+        "Le scanner hésitait entre 'animal mythique' et 'mème national'. Il a choisi les deux sans demander d'autorisation.",
+        "Niveau de rugissement : assez élevé pour faire quitter la partie à un lobby entier sur Warzone.",
+        "Tu dégages une vibe de boss caché qu'on rencontre après avoir cliqué sur un bouton qui n'existait même pas.",
+        "Présence certifiée 4K HDR Dolby Rugissement. Les voisins ont probablement entendu le charisme passer.",
+        "Le système te classe entre 'icône locale', 'légende incomprise' et 'type qui arrive avec une musique d'entrée'.",
+        "Tu as une aura de mème rare trouvé à 2h17, drôle sans raison, et impossible à expliquer à des adultes responsables.",
+        "Ce résultat n'a aucun sens scientifique, mais énormément de sens émotionnel. Et parfois c'est encore plus fort.",
+        "Le scanner a noté 'énorme potentiel de montage edit avec flammes, yeux brillants et texte sigma'.",
+        "Tu respires l'énergie d'un personnage qui dit 't'inquiète' puis fait exactement l'inverse, mais avec style.",
+        "Validation totale. Même un type sur Discord aurait répondu 'frère c'est clairement un tigre'.",
+        "On dirait le genre de tigre qui lancerait un business en ligne depuis la jungle et réussirait quand même.",
+        "Ta présence rappelle un mème oublié de 2021 qui revient soudainement et redevient hilarant sans explication."
       ];
 
       const state = {
@@ -774,7 +915,7 @@
           ultra: false,
           badge: "Tigre certifié",
           title: "Tié un tigre du " + country,
-          subtitle: "Espèce locale reconnue par le grand scanner orange."
+          subtitle: getRandomItem(countrySubtitles)
         };
       }
 
