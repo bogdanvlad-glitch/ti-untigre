@@ -1,0 +1,516 @@
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Camera, RotateCcw, Sparkles, Crown, Flame, ScanFace } from "lucide-react";
+
+const BRAND_LOGO = "/logo.png";
+const BRAND_FAVICON = "/favicon.png";
+
+const funnyCountries = [
+  "Franchat",
+  "Belgiquou",
+  "Tigralie",
+  "Mexichat",
+  "Japongrrr",
+  "Canadou",
+  "Brésilou",
+  "Itatigre",
+  "Marocroc",
+  "Espagrrrne",
+  "Argentigre",
+  "Indigrrre",
+  "Turgrrie",
+  "Chagrre",
+  "Portugrrral",
+  "Norvroum",
+  "Suissou",
+  "Camerounet",
+  "Tunigrrre",
+  "Algérrrire",
+  "Tigrlande",
+  "Sénégrawl",
+  "Croagrrre",
+  "Hongrugrrre",
+  "Finlagnou",
+  "Danigrrrk",
+  "Tanzanigre",
+  "Kenyagrrr",
+  "Tigrafrique du Sud",
+  "Pérougarou",
+  "Chiligrre",
+  "Bolitigre",
+  "Urugrrray",
+  "Paragrrray",
+  "Colombraw",
+  "Costarugrrra",
+  "Panamiaou",
+  "Guatigrre",
+  "Vietgrrrnam",
+  "Thaïtigre",
+  "Malaiscratch",
+  "Indonégrrrsie",
+  "Philigrrrines",
+  "Corégrrre du Sud",
+  "Tigrapour",
+  "Néozégrrrlande",
+  "Groengrrrland",
+  "Islandou",
+  "Monacraw",
+  "Luxemburgrrr",
+  "Autrichat",
+  "Grecrouh",
+  "Roumignou",
+  "Bulgrrrare",
+  "Serbigrrre",
+  "Tchétigrrre",
+  "Kazagrrrstan",
+  "Mongrrrolie",
+  "Népalou",
+  "Bhoutigrrran",
+  "Sri Lankraw",
+  "Madagrrrscar",
+  "Nigrrria",
+  "Ghanagrrre",
+  "Bostigrrrwana",
+  "Namibraw",
+  "Ougrrranda"
+];
+
+const specialTigerTypes = [
+  { name: "Roi des Tigres", weight: 1, description: "niveau absolument absurde. Apparition ultra rare.", badge: "Légende vivante", ultra: true },
+  { name: "Tigre Golden", weight: 6, description: "brille un peu trop pour rester discret.", badge: "Tigre spécial" },
+  { name: "Tigre Bungalaw", weight: 3, description: "rare, mystérieux, et légèrement dramatique.", badge: "Tigre spécial" },
+  { name: "Tigre Turbo", weight: 5, description: "impossible à suivre quand il commence à bouger.", badge: "Tigre spécial" },
+  { name: "Tigre Céleste", weight: 4, description: "regard légendaire, aura suspectement majestueuse.", badge: "Tigre spécial" },
+  { name: "Tigre de Minuit", weight: 4, description: "élégant, discret, un peu trop stylé.", badge: "Tigre spécial" },
+  { name: "Tigre Suprême", weight: 2, description: "fait peur aux autres tigres sans même essayer.", badge: "Tigre spécial" },
+  { name: "Tigre Volt", weight: 4, description: "chargé en énergie orange non homologuée.", badge: "Tigre spécial" },
+  { name: "Tigre Comète", weight: 3, description: "arrive vite, repart avec panache.", badge: "Tigre spécial" },
+  { name: "Tigre Mirage", weight: 3, description: "on le voit, puis on doute d'avoir eu le droit de le voir.", badge: "Tigre spécial" }
+];
+
+function getRandomItem(list) {
+  return list[Math.floor(Math.random() * list.length)];
+}
+
+function pickWeightedTiger(list) {
+  const totalWeight = list.reduce((sum, item) => sum + item.weight, 0);
+  let roll = Math.random() * totalWeight;
+
+  for (const item of list) {
+    roll -= item.weight;
+    if (roll <= 0) return item;
+  }
+
+  return list[list.length - 1];
+}
+
+function pickTigerResult(attemptNumber) {
+  const nonTigerChance = 0.06;
+  if (Math.random() < nonTigerChance) {
+    return {
+      isTiger: false,
+      special: false,
+      title: "Tié pas un tigre",
+      subtitle: "Cas très rare. Le scanner a cligné des yeux.",
+      badge: "Anomalie cosmique"
+    };
+  }
+
+  const isBoostedAttempt = attemptNumber <= 3;
+  const specialChance = isBoostedAttempt ? 0.3 : 0.12;
+
+  if (Math.random() < specialChance) {
+    const specialTiger = pickWeightedTiger(specialTigerTypes);
+    return {
+      isTiger: true,
+      special: true,
+      ultra: Boolean(specialTiger.ultra),
+      title: `Tié un ${specialTiger.name}`,
+      subtitle: specialTiger.description,
+      badge: specialTiger.badge,
+      boosted: isBoostedAttempt
+    };
+  }
+
+  const country = getRandomItem(funnyCountries);
+  return {
+    isTiger: true,
+    special: false,
+    title: `Tié un tigre du ${country}`,
+    subtitle: "Espèce locale reconnue par le grand scanner orange.",
+    badge: "Tigre certifié"
+  };
+}
+
+export default function TigreMobileSite() {
+  const videoRef = useRef(null);
+  const canvasRef = useRef(null);
+  const streamRef = useRef(null);
+
+  const [screen, setScreen] = useState("home");
+  const [capturedImage, setCapturedImage] = useState(null);
+  const [result, setResult] = useState(null);
+  const [cameraError, setCameraError] = useState("");
+  const [facingMode, setFacingMode] = useState("environment");
+  const [attemptCount, setAttemptCount] = useState(0);
+  const [logoVisible, setLogoVisible] = useState(false);
+
+  const specialParticles = useMemo(
+    () => Array.from({ length: 22 }, (_, i) => ({ id: i, left: Math.random() * 100, delay: Math.random() * 1.8, emoji: i % 3 === 0 ? "✨" : i % 3 === 1 ? "🔥" : "⭐" })),
+    []
+  );
+
+  useEffect(() => {
+    const storedAttempts = Number(window.localStorage.getItem("tigre_attempt_count") || "0");
+    setAttemptCount(storedAttempts);
+
+    const img = new Image();
+    img.onload = () => setLogoVisible(true);
+    img.onerror = () => setLogoVisible(false);
+    img.src = BRAND_LOGO;
+
+    let favicon = document.querySelector("link[rel='icon']");
+    if (!favicon) {
+      favicon = document.createElement("link");
+      favicon.setAttribute("rel", "icon");
+      document.head.appendChild(favicon);
+    }
+    favicon.setAttribute("href", BRAND_FAVICON);
+
+    document.title = "TIGRE";
+
+    return () => stopCamera();
+  }, []);
+
+  async function startCamera(nextFacingMode = facingMode) {
+    try {
+      stopCamera();
+      setCameraError("");
+      setCapturedImage(null);
+      setResult(null);
+      setScreen("camera");
+
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: { ideal: nextFacingMode },
+          width: { ideal: 1280 },
+          height: { ideal: 720 }
+        },
+        audio: false
+      });
+
+      streamRef.current = stream;
+
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        await videoRef.current.play();
+      }
+    } catch (error) {
+      setCameraError("Impossible d'ouvrir la caméra. Vérifie les permissions de ton navigateur.");
+      setScreen("home");
+    }
+  }
+
+  function stopCamera() {
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((track) => track.stop());
+      streamRef.current = null;
+    }
+  }
+
+  function switchCamera() {
+    const next = facingMode === "environment" ? "user" : "environment";
+    setFacingMode(next);
+    startCamera(next);
+  }
+
+  function takePhoto() {
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
+    if (!video || !canvas) return;
+
+    const width = video.videoWidth || 720;
+    const height = video.videoHeight || 1280;
+
+    canvas.width = width;
+    canvas.height = height;
+
+    const ctx = canvas.getContext("2d");
+    ctx.drawImage(video, 0, 0, width, height);
+
+    const image = canvas.toDataURL("image/jpeg", 0.92);
+    const nextAttempt = attemptCount + 1;
+    window.localStorage.setItem("tigre_attempt_count", String(nextAttempt));
+    setAttemptCount(nextAttempt);
+    setCapturedImage(image);
+    stopCamera();
+    setScreen("analyzing");
+
+    window.setTimeout(() => {
+      setResult(pickTigerResult(nextAttempt));
+      setScreen("result");
+    }, 1400);
+  }
+
+  function resetAll() {
+    stopCamera();
+    setCapturedImage(null);
+    setResult(null);
+    setCameraError("");
+    setScreen("home");
+  }
+
+  return (
+    <div className="min-h-screen overflow-hidden bg-gradient-to-b from-orange-300 via-orange-500 to-orange-700 text-white">
+      <div className="mx-auto flex min-h-screen max-w-md flex-col px-4 py-5">
+        <div className="mb-4 flex items-center justify-between gap-3">
+          <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }} className="flex items-center gap-3">
+            {logoVisible ? (
+              <img src={BRAND_LOGO} alt="Logo TIGRE" className="h-12 w-12 rounded-2xl object-cover shadow-lg" />
+            ) : (
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/15 text-2xl shadow-lg">🐯</div>
+            )}
+            <div>
+              <div className="text-xs uppercase tracking-[0.35em] text-orange-100/90">Scanner félin</div>
+              <h1 className="text-3xl font-black leading-none">TIGRE</h1>
+            </div>
+          </motion.div>
+        </div>
+
+        <div className="relative flex-1 rounded-[2rem] border border-white/20 bg-white/10 p-4 shadow-2xl backdrop-blur-xl">
+          <AnimatePresence mode="wait">
+            {screen === "home" && (
+              <motion.div
+                key="home"
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -16 }}
+                className="flex h-full flex-col justify-between"
+              >
+                <div>
+                  <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-sm font-medium">
+                    <Sparkles size={16} /> Détection tigresque avancée
+                  </div>
+
+                  <div className="rounded-[1.75rem] border border-white/15 bg-gradient-to-br from-orange-200/20 to-black/10 p-5">
+                    <div className="mb-3 text-6xl">🐯</div>
+                    <h2 className="text-2xl font-extrabold leading-tight">Prends une photo et découvre ton tigre intérieur</h2>
+                    <p className="mt-3 text-sm text-orange-50/90">
+                      Appuie sur le bouton, ouvre la caméra, prends ta photo… et le scanner te dira si tié un tigre ou non.
+                    </p>
+                    <p className="mt-3 text-xs text-orange-100/85">
+                      Les 3 premiers essais ont plus de chances de révéler un tigre spécial.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <button
+                    onClick={() => startCamera()}
+                    className="flex w-full items-center justify-center gap-2 rounded-2xl bg-white px-4 py-4 text-lg font-extrabold text-orange-600 shadow-lg transition active:scale-[0.98]"
+                  >
+                    <Camera size={22} /> TIGRE
+                  </button>
+
+                  {cameraError ? (
+                    <div className="rounded-2xl border border-red-200/40 bg-red-500/20 px-3 py-3 text-sm text-white">
+                      {cameraError}
+                    </div>
+                  ) : null}
+                </div>
+              </motion.div>
+            )}
+
+            {screen === "camera" && (
+              <motion.div
+                key="camera"
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -16 }}
+                className="flex h-full flex-col"
+              >
+                <div className="mb-3 flex items-center justify-between">
+                  <div>
+                    <div className="text-xs uppercase tracking-[0.3em] text-orange-100/80">Caméra ouverte</div>
+                    <div className="text-lg font-bold">Cadre ton visage de tigre</div>
+                  </div>
+                  <button
+                    onClick={resetAll}
+                    className="rounded-full bg-white/15 p-3 backdrop-blur transition active:scale-95"
+                    aria-label="Retour"
+                  >
+                    <RotateCcw size={18} />
+                  </button>
+                </div>
+
+                <div className="relative flex-1 overflow-hidden rounded-[1.75rem] border border-white/20 bg-black/30">
+                  <video ref={videoRef} autoPlay playsInline muted className="h-full w-full object-cover" />
+                  <div className="pointer-events-none absolute inset-0 border-[10px] border-white/10" />
+                  <div className="pointer-events-none absolute inset-x-6 top-6 rounded-full bg-black/25 px-3 py-2 text-center text-xs font-medium backdrop-blur">
+                    Le scanner cherche ton énergie tigresque…
+                  </div>
+                </div>
+
+                <div className="mt-4 grid grid-cols-2 gap-3">
+                  <button
+                    onClick={switchCamera}
+                    className="rounded-2xl border border-white/20 bg-white/10 px-4 py-4 font-bold backdrop-blur active:scale-[0.98]"
+                  >
+                    Tourner caméra
+                  </button>
+                  <button
+                    onClick={takePhoto}
+                    className="rounded-2xl bg-white px-4 py-4 font-extrabold text-orange-600 active:scale-[0.98]"
+                  >
+                    Prendre la photo
+                  </button>
+                </div>
+              </motion.div>
+            )}
+
+            {screen === "analyzing" && (
+              <motion.div
+                key="analyzing"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="flex h-full flex-col justify-center text-center"
+              >
+                <div className="mx-auto mb-6 h-24 w-24 animate-pulse rounded-full border-4 border-white/25 border-t-white" />
+                <div className="mb-2 flex items-center justify-center gap-2 text-2xl font-black">
+                  <ScanFace size={26} /> Analyse tigresque
+                </div>
+                <p className="mx-auto max-w-xs text-sm text-orange-50/90">
+                  Vérification du niveau de rugissement, de majesté et de puissance féline…
+                </p>
+                {capturedImage ? (
+                  <img src={capturedImage} alt="Capture" className="mx-auto mt-6 h-36 w-28 rounded-2xl object-cover shadow-xl" />
+                ) : null}
+              </motion.div>
+            )}
+
+            {screen === "result" && result && (
+              <motion.div
+                key="result"
+                initial={{ opacity: 0, y: 18 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -18 }}
+                className="relative flex h-full flex-col"
+              >
+                {result.special && (
+                  <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-[1.75rem]">
+                    <motion.div
+                      className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.32),_transparent_55%)]"
+                      animate={{ opacity: [0.45, 0.8, 0.45] }}
+                      transition={{ duration: 1.8, repeat: Infinity }}
+                    />
+                    <motion.div
+                      className="absolute -inset-12 rounded-full bg-white/15 blur-3xl"
+                      animate={{ scale: [1, 1.18, 1], opacity: [0.28, 0.62, 0.28] }}
+                      transition={{ duration: result.ultra ? 1.7 : 2.4, repeat: Infinity }}
+                    />
+                    {specialParticles.map((p) => (
+                      <motion.div
+                        key={p.id}
+                        className="absolute text-2xl"
+                        style={{ left: `${p.left}%`, bottom: -20 }}
+                        animate={{ y: -520, rotate: [0, 18, -18, 0], opacity: [0, 1, 1, 0], scale: result.ultra ? [0.8, 1.3, 1] : [0.8, 1.1, 1] }}
+                        transition={{ duration: result.ultra ? 3.2 : 4, repeat: Infinity, delay: p.delay, ease: "easeOut" }}
+                      >
+                        {p.emoji}
+                      </motion.div>
+                    ))}
+                  </div>
+                )}
+
+                <div className="relative z-10 flex-1">
+                  <div className="mb-4 flex items-start justify-between gap-3">
+                    <div className="rounded-full bg-white/15 px-3 py-1 text-xs font-extrabold uppercase tracking-[0.25em] backdrop-blur">
+                      {result.badge}
+                    </div>
+                    {result.special ? (
+                      <motion.div
+                        animate={result.ultra ? { y: [0, -7, 0], rotate: [0, 10, -10, 0], scale: [1, 1.12, 1] } : { y: [0, -4, 0], scale: [1, 1.05, 1] }}
+                        transition={{ duration: result.ultra ? 1.6 : 2.1, repeat: Infinity }}
+                        className={`rounded-full ${result.ultra ? "bg-yellow-300/20" : "bg-white/15"} p-3`}
+                      >
+                        {result.ultra ? <Crown size={28} /> : <Flame size={24} />}
+                      </motion.div>
+                    ) : (
+                      <div className="rounded-full bg-white/15 p-3">
+                        <Flame size={24} />
+                      </div>
+                    )}
+                  </div>
+
+                  <div className={`mb-4 overflow-hidden rounded-[1.75rem] border border-white/20 ${result.special ? "bg-white/10 shadow-[0_0_40px_rgba(255,255,255,0.18)]" : "bg-black/20"}`}>
+                    {capturedImage ? (
+                      <motion.img
+                        src={capturedImage}
+                        alt="Résultat"
+                        className="h-56 w-full object-cover"
+                        animate={result.special ? { scale: [1, 1.03, 1], filter: ["brightness(1)", "brightness(1.18)", "brightness(1)"] } : {}}
+                        transition={result.special ? { duration: 2.2, repeat: Infinity } : {}}
+                      />
+                    ) : (
+                      <div className="flex h-56 items-center justify-center text-6xl">🐯</div>
+                    )}
+                  </div>
+
+                  <motion.h2
+                    className="text-3xl font-black leading-tight"
+                    animate={result.special ? { scale: [1, 1.03, 1], y: [0, -2, 0] } : {}}
+                    transition={result.special ? { duration: 1.5, repeat: Infinity } : {}}
+                  >
+                    {result.title}
+                  </motion.h2>
+
+                  <p className="mt-3 text-base text-orange-50/95">{result.subtitle}</p>
+
+                  {result.ultra && (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      className="mt-5 rounded-[1.5rem] border border-yellow-200/30 bg-yellow-300/20 p-4 text-center shadow-2xl"
+                    >
+                      <div className="mb-1 text-sm font-bold uppercase tracking-[0.25em]">Événement rarissime</div>
+                      <div className="text-xl font-black">Le royaume des tigres te salue 👑</div>
+                    </motion.div>
+                  )}
+
+                  {result.special && !result.ultra && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="mt-5 rounded-[1.5rem] border border-white/20 bg-white/10 p-4 text-center shadow-xl backdrop-blur"
+                    >
+                      <div className="text-sm font-bold uppercase tracking-[0.25em]">Tigre spécial détecté</div>
+                      <div className="mt-1 text-lg font-black">La jungle a validé ton niveau</div>
+                    </motion.div>
+                  )}
+                </div>
+
+                <div className="relative z-10 mt-5 grid grid-cols-2 gap-3">
+                  <button
+                    onClick={() => startCamera()}
+                    className="rounded-2xl bg-white px-4 py-4 font-extrabold text-orange-600 active:scale-[0.98]"
+                  >
+                    Refaire
+                  </button>
+                  <button
+                    onClick={resetAll}
+                    className="rounded-2xl border border-white/20 bg-white/10 px-4 py-4 font-bold backdrop-blur active:scale-[0.98]"
+                  >
+                    Accueil
+                  </button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </div>
+
+      <canvas ref={canvasRef} className="hidden" />
+    </div>
+  );
+}
