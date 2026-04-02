@@ -256,6 +256,60 @@
         min-height: 0;
         height: 100%;
         flex: 1;
+        touch-action: manipulation;
+      }
+
+      .camera-ui-top {
+        position: absolute;
+        top: 14px;
+        left: 14px;
+        right: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        z-index: 3;
+      }
+
+      .camera-control {
+        border: 0;
+        cursor: pointer;
+        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
+      }
+
+      .back-overlay-btn {
+        width: 46px;
+        height: 46px;
+        border-radius: 999px;
+        background: rgba(0, 0, 0, 0.26);
+        color: white;
+        font-size: 18px;
+        backdrop-filter: blur(8px);
+      }
+
+      .ok-btn {
+        min-width: 64px;
+        height: 46px;
+        padding: 0 18px;
+        border-radius: 999px;
+        background: #2f80ff;
+        color: white;
+        font-size: 16px;
+        font-weight: 900;
+      }
+
+      .camera-note {
+        position: absolute;
+        left: 18px;
+        right: 18px;
+        bottom: 18px;
+        top: auto;
+        text-align: center;
+        padding: 10px 14px;
+        border-radius: 999px;
+        background: rgba(0, 0, 0, 0.24);
+        font-size: 12px;
+        font-weight: 700;
+        backdrop-filter: blur(10px);
       }
 
       .camera-note {
@@ -539,7 +593,7 @@
               <p class="muted small">
                 Appuie sur le bouton, ouvre la caméra, prends ta photo… et le scanner te dira si tié un tigre ou non.
               </p>
-              <p class="tiny muted">Les 3 premiers essais ont plus de chances de révéler un tigre spécial.</p>
+              
             </div>
             <div class="home-actions">
               <button id="startBtn" class="primary-btn">TIGRE</button>
@@ -549,24 +603,20 @@
         </section>
 
         <section id="cameraScreen" class="screen camera-screen">
-          <div class="section-stack" style="flex: 1">
-            <div class="top-row">
-              <div>
-                <div class="eyebrow">Caméra ouverte</div>
-                <p style="font-size: 20px; font-weight: 900; margin-top: 4px">Cadre ton visage de tigre</p>
-              </div>
-              <button id="backBtn" class="round-btn" aria-label="Retour">↺</button>
+          <div class="section-stack" style="flex: 1; min-height: 0">
+            <div>
+              <div class="eyebrow">Caméra ouverte</div>
+              <p style="font-size: 20px; font-weight: 900; margin-top: 4px">Double-tape pour retourner la caméra</p>
             </div>
 
-            <div class="video-wrap">
+            <div id="cameraTouchZone" class="video-wrap">
               <video id="video" autoplay playsinline muted></video>
-              <div class="camera-note">Le scanner cherche ton énergie tigresque…</div>
+              <div class="camera-ui-top">
+                <button id="backBtn" class="back-overlay-btn camera-control" aria-label="Retour">↺</button>
+                <button id="okAnalyzeBtn" class="ok-btn camera-control">OK</button>
+              </div>
+              <div class="camera-note">Cadre ton visage, puis appuie sur OK</div>
             </div>
-          </div>
-
-          <div class="actions-2">
-            <button id="switchBtn" class="secondary-btn">Tourner caméra</button>
-            <button id="captureBtn" class="primary-btn" style="font-size: 16px">Prendre la photo</button>
           </div>
         </section>
 
@@ -617,6 +667,7 @@
         </section>
       </div>
 
+      <audio id="resultSound" src="./tigre-sound.mp4" preload="auto" playsinline></audio>
       <canvas id="canvas" class="hidden-canvas"></canvas>
     </div>
 
@@ -808,6 +859,7 @@
         facingMode: "environment",
         stream: null,
         capturedImage: "",
+        audioPrimed: false,
         attemptCount: Number(localStorage.getItem("tigre_attempt_count") || "0")
       };
 
@@ -822,9 +874,12 @@
       const logoFallback = document.getElementById("logoFallback");
       const errorBox = document.getElementById("errorBox");
       const video = document.getElementById("video");
+      const cameraTouchZone = document.getElementById("cameraTouchZone");
+      const okAnalyzeBtn = document.getElementById("okAnalyzeBtn");
       const canvas = document.getElementById("canvas");
       const analyzingImage = document.getElementById("analyzingImage");
       const resultImage = document.getElementById("resultImage");
+      const resultSound = document.getElementById("resultSound");
       const resultBadge = document.getElementById("resultBadge");
       const resultIcon = document.getElementById("resultIcon");
       const resultTitle = document.getElementById("resultTitle");
@@ -838,10 +893,31 @@
 
       document.getElementById("startBtn").addEventListener("click", () => startCamera());
       document.getElementById("backBtn").addEventListener("click", resetAll);
-      document.getElementById("switchBtn").addEventListener("click", switchCamera);
-      document.getElementById("captureBtn").addEventListener("click", takePhoto);
+      okAnalyzeBtn.addEventListener("click", takePhoto);
       document.getElementById("retryBtn").addEventListener("click", () => startCamera());
       document.getElementById("homeBtn").addEventListener("click", resetAll);
+
+      let lastCameraTap = 0;
+
+      cameraTouchZone.addEventListener("dblclick", (event) => {
+        if (event.target.closest(".camera-control")) return;
+        event.preventDefault();
+        switchCamera();
+      });
+
+      cameraTouchZone.addEventListener(
+        "touchend",
+        (event) => {
+          if (event.target.closest(".camera-control")) return;
+          const now = Date.now();
+          if (now - lastCameraTap < 320) {
+            event.preventDefault();
+            switchCamera();
+          }
+          lastCameraTap = now;
+        },
+        { passive: false }
+      );
 
       brandLogo.addEventListener("error", () => {
         brandLogo.style.display = "none";
@@ -877,6 +953,49 @@
         }
 
         return list[list.length - 1];
+      }
+
+      function primeAudio() {
+        if (!resultSound || state.audioPrimed) return;
+
+        try {
+          resultSound.muted = true;
+          const playAttempt = resultSound.play();
+
+          if (playAttempt && typeof playAttempt.then === "function") {
+            playAttempt
+              .then(() => {
+                resultSound.pause();
+                resultSound.currentTime = 0;
+                resultSound.muted = false;
+                state.audioPrimed = true;
+              })
+              .catch(() => {
+                resultSound.muted = false;
+              });
+          } else {
+            resultSound.pause();
+            resultSound.currentTime = 0;
+            resultSound.muted = false;
+            state.audioPrimed = true;
+          }
+        } catch (error) {
+          resultSound.muted = false;
+        }
+      }
+
+      function playResultSound() {
+        if (!resultSound) return;
+
+        try {
+          resultSound.pause();
+          resultSound.currentTime = 0;
+          resultSound.muted = false;
+          const playAttempt = resultSound.play();
+          if (playAttempt && typeof playAttempt.catch === "function") {
+            playAttempt.catch(() => {});
+          }
+        } catch (error) {}
       }
 
       function pickTigerResult(attemptNumber) {
@@ -920,6 +1039,7 @@
       }
 
       async function startCamera() {
+        primeAudio();
         setError("");
         showScreen("camera");
         resultImage.classList.remove("special");
@@ -960,6 +1080,7 @@
       }
 
       function takePhoto() {
+        primeAudio();
         if (!video.videoWidth || !video.videoHeight) return;
 
         const width = video.videoWidth;
@@ -1018,6 +1139,9 @@
 
         if (!result.special) {
           resultIcon.textContent = result.isTiger ? "🔥" : "🫥";
+          if (result.isTiger) {
+            playResultSound();
+          }
           return;
         }
 
@@ -1026,6 +1150,8 @@
         specialOverlay.classList.add("active");
         renderParticles(result.ultra);
         specialCard.style.display = "block";
+
+        playResultSound();
 
         if (result.ultra) {
           resultIcon.textContent = "👑";
