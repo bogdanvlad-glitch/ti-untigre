@@ -250,6 +250,10 @@
         width: 100%;
         height: 100%;
         object-fit: cover;
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
+        transform: translateZ(0);
+        image-rendering: auto;
       }
 
       .video-wrap {
@@ -747,7 +751,44 @@
         "Rizotto-sur-Grrr",
         "Wakandou du dimanche",
         "Molduvie du rugissement",
-        "Pamplemoussie Centrale"
+        "Pamplemoussie Centrale",
+        "Chocotigrie",
+        "Macaronésie du Feu",
+        "Yapadekoi-les-Tigres",
+        "Tigristan de la Sieste",
+        "Dubaïe aïe aïe",
+        "Miamiland Supreme",
+        "Patatagonie",
+        "Ramenbourg",
+        "Sushiville Max",
+        "Tigrépublique du Chill",
+        "Sigma-sur-Mer",
+        "Chipslavie",
+        "Brolandia Premium",
+        "Biscottarie",
+        "Gaufrix",
+        "Croustiland",
+        "Nuggetonie",
+        "Bretzellerie Mystique",
+        "Pingouinie du Soleil",
+        "Dinosarie Administrative",
+        "Tartiflette Empire",
+        "Croutonistan",
+        "Bourguignator",
+        "Lasagnie Interdite",
+        "Moutardix",
+        "Fricadellistan",
+        "Pizzabama",
+        "Bananistan Ultra Plus",
+        "Gruyèrie Galactique",
+        "Rizland Deluxe",
+        "Churroslavie",
+        "Kebabolie des neiges",
+        "Boulgour City",
+        "Mayoland",
+        "Pesto Rico",
+        "Pailletia Prime",
+        "Kikoololie du Nord"
       ];
 
       const specialTigerTypes = [
@@ -834,6 +875,69 @@
           description: "Aucun sens, zéro contexte, mais une autorité terrifiante. Même les formulaires se remplissent tout seuls devant lui.",
           badge: "Tigre spécial",
           ultra: false
+        },
+        {
+          name: "Tigre Croque-Monsieur 3000",
+          weight: 3,
+          description: "Mi-snack, mi-prédateur, mi-problème administratif. Oui ça fait trois moitiés, et alors.",
+          badge: "Tigre spécial",
+          ultra: false
+        },
+        {
+          name: "Tigre GPU de la Forêt",
+          weight: 2,
+          description: "Fait tourner le ray tracing de la jungle en ultra sans ventilateur. Les arbres ont chaud mais c'est très beau.",
+          badge: "Tigre spécial",
+          ultra: false
+        },
+        {
+          name: "Tigre Chaussette Légendaire",
+          weight: 3,
+          description: "Impossible à trouver en paire, mais quand il apparaît tout le monde crie au génie. Très niche, très puissant.",
+          badge: "Tigre spécial",
+          ultra: false
+        },
+        {
+          name: "Tigre Paillette de Combat",
+          weight: 3,
+          description: "Arrive en brillant beaucoup trop fort pour une situation normale. L'ennemi abandonne pour raisons esthétiques.",
+          badge: "Tigre spécial",
+          ultra: false
+        },
+        {
+          name: "Tigre Évier Final Boss",
+          weight: 2,
+          description: "Personne ne comprend le lore mais tout le monde respecte la menace. Même la vaisselle se range seule.",
+          badge: "Tigre spécial",
+          ultra: false
+        },
+        {
+          name: "Tigre Kebab Cosmique",
+          weight: 3,
+          description: "Tourne lentement dans l'univers en diffusant une sagesse grasse et délicieuse. Très rare après minuit.",
+          badge: "Tigre spécial",
+          ultra: false
+        },
+        {
+          name: "Tigre Capybara Édition Nuit",
+          weight: 2,
+          description: "Zen, incompréhensible, beaucoup trop à l'aise. Donne l'impression de connaître un secret sur tout le monde.",
+          badge: "Tigre spécial",
+          ultra: false
+        },
+        {
+          name: "Tigre Antivirus Premium",
+          weight: 2,
+          description: "Détecte les mauvaises vibes, les faux frères et les blagues pas drôles avant même qu'elles existent.",
+          badge: "Tigre spécial",
+          ultra: false
+        },
+        {
+          name: "Tigre Quatre Fromages Ascendant Dragon",
+          weight: 2,
+          description: "Un build totalement illégal, mais la meta n'ose rien dire. Odeur de victoire et de pizzeria mystique.",
+          badge: "Tigre spécial",
+          ultra: false
         }
       ];
 
@@ -852,7 +956,17 @@
         "Tu respires l'énergie d'un personnage qui dit 't'inquiète' puis fait exactement l'inverse, mais avec style.",
         "Validation totale. Même un type sur Discord aurait répondu 'frère c'est clairement un tigre'.",
         "On dirait le genre de tigre qui lancerait un business en ligne depuis la jungle et réussirait quand même.",
-        "Ta présence rappelle un mème oublié de 2021 qui revient soudainement et redevient hilarant sans explication."
+        "Ta présence rappelle un mème oublié de 2021 qui revient soudainement et redevient hilarant sans explication.",
+        "Le conseil des anciens a vu ta photo et a simplement dit 'ah ouais lui il est problématique en 1v1'.",
+        "Tu as l'énergie d'un personnage qui spawn avec une musique drill sans que personne n'ait branché d'enceinte.",
+        "Les statistiques sont confuses, les scientifiques sont partis, mais la vibe générale crie très fort 'tigre confirmé'.",
+        "Tu inspires la même peur respectueuse qu'un message 'on peut parler ?' envoyé à 23h48.",
+        "On raconte que ce genre de tigre peut ouvrir un frigo, fixer une compote, et gagner quand même le débat.",
+        "Le scan a détecté une quantité dangereuse d'aura, de sauce et de menace passive. C'est magnifique.",
+        "Résultat ultra crédible si on accepte que les lois de la physique soient remplacées par les commentaires TikTok.",
+        "Tu as été classé dans la catégorie 'très sérieux extérieurement, complètement absurde intérieurement'.",
+        "Même le bouton OK a hésité avant de confirmer un niveau pareil. C'est dire la gravité de la situation.",
+        "Franchement, on dirait un tigre qui aurait une intro YouTube en flammes, un pseudo imprononçable et 200 000 abonnés."
       ];
 
       const state = {
@@ -1053,14 +1167,41 @@
           const stream = await navigator.mediaDevices.getUserMedia({
             video: {
               facingMode: { ideal: state.facingMode },
-              width: { ideal: 1280 },
-              height: { ideal: 720 }
+              width: { ideal: 1920 },
+              height: { ideal: 1080 },
+              aspectRatio: { ideal: 9 / 16 }
             },
             audio: false
           });
 
           state.stream = stream;
+          const videoTrack = stream.getVideoTracks()[0];
+
+          try {
+            const capabilities = videoTrack.getCapabilities ? videoTrack.getCapabilities() : null;
+            const advanced = [];
+
+            if (capabilities && capabilities.width && capabilities.width.max) {
+              advanced.push({ width: capabilities.width.max });
+            }
+            if (capabilities && capabilities.height && capabilities.height.max) {
+              advanced.push({ height: capabilities.height.max });
+            }
+            if (capabilities && capabilities.focusMode && capabilities.focusMode.includes("continuous")) {
+              advanced.push({ focusMode: "continuous" });
+            }
+            if (capabilities && capabilities.resizeMode && capabilities.resizeMode.includes("none")) {
+              advanced.push({ resizeMode: "none" });
+            }
+
+            if (advanced.length) {
+              await videoTrack.applyConstraints({ advanced });
+            }
+          } catch (error) {}
+
           video.srcObject = stream;
+          video.playsInline = true;
+          video.setAttribute("playsinline", "true");
           await video.play();
         } catch (error) {
           showScreen("home");
