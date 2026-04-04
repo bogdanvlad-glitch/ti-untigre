@@ -150,7 +150,8 @@
       }
 
       .camera-screen,
-      .result-screen {
+      .result-screen,
+      .prestige-screen {
         justify-content: space-between;
       }
 
@@ -177,7 +178,9 @@
       }
 
       .hero-box,
-      .special-card {
+      .special-card,
+      .prestige-box,
+      .unlock-box {
         border-radius: 28px;
         border: 1px solid rgba(255, 255, 255, 0.15);
         background: linear-gradient(135deg, rgba(255, 226, 182, 0.16), rgba(0, 0, 0, 0.12));
@@ -199,6 +202,10 @@
         gap: 12px;
       }
 
+      .span-2 {
+        grid-column: span 2;
+      }
+
       .primary-btn,
       .secondary-btn,
       .ghost-btn {
@@ -206,7 +213,7 @@
         border-radius: 22px;
         padding: 16px 18px;
         cursor: pointer;
-        transition: transform 0.14s ease, opacity 0.14s ease;
+        transition: transform 0.14s ease, opacity 0.14s ease, filter 0.14s ease;
       }
 
       .primary-btn:active,
@@ -235,6 +242,12 @@
         color: white;
         font-weight: 800;
         border: 1px dashed rgba(255, 255, 255, 0.28);
+      }
+
+      .disabled-btn {
+        opacity: 0.46;
+        filter: grayscale(0.3);
+        cursor: not-allowed;
       }
 
       .actions-2 {
@@ -442,6 +455,103 @@
         animation: titlePop 1.5s ease-in-out infinite;
       }
 
+      .prestige-screen {
+        gap: 12px;
+      }
+
+      .prestige-top {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .prestige-stats {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+      }
+
+      .prestige-stat {
+        border-radius: 22px;
+        padding: 14px 10px;
+        background: rgba(255, 255, 255, 0.12);
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        text-align: center;
+      }
+
+      .prestige-value {
+        display: block;
+        font-size: 28px;
+        font-weight: 900;
+      }
+
+      .prestige-label {
+        font-size: 12px;
+        color: rgba(255, 245, 235, 0.9);
+      }
+
+      .progress-shell {
+        width: 100%;
+        height: 12px;
+        border-radius: 999px;
+        overflow: hidden;
+        background: rgba(255, 255, 255, 0.12);
+        border: 1px solid rgba(255, 255, 255, 0.16);
+      }
+
+      .progress-fill {
+        height: 100%;
+        width: 0%;
+        border-radius: 999px;
+        background: linear-gradient(90deg, #fff0cf 0%, #ffd24c 45%, #ff9800 100%);
+        transition: width 0.35s ease;
+      }
+
+      .prestige-list-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        font-size: 13px;
+        font-weight: 800;
+      }
+
+      .prestige-list {
+        flex: 1;
+        min-height: 0;
+        overflow: auto;
+        display: flex;
+        flex-wrap: wrap;
+        align-content: flex-start;
+        gap: 10px;
+        padding-right: 4px;
+      }
+
+      .prestige-chip,
+      .locked-chip {
+        max-width: 100%;
+        border-radius: 999px;
+        padding: 10px 13px;
+        font-size: 12px;
+        font-weight: 800;
+        line-height: 1.2;
+      }
+
+      .prestige-chip {
+        background: rgba(255, 255, 255, 0.18);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      .locked-chip {
+        background: rgba(0, 0, 0, 0.16);
+        border: 1px dashed rgba(255, 255, 255, 0.18);
+        color: rgba(255, 245, 235, 0.76);
+      }
+
+      .unlock-box {
+        box-shadow: 0 16px 34px rgba(0, 0, 0, 0.18);
+      }
+
       .error-box {
         padding: 14px;
         border-radius: 22px;
@@ -450,7 +560,8 @@
         font-size: 14px;
       }
 
-      .save-note {
+      .save-note,
+      .prestige-note {
         text-align: center;
         color: rgba(255, 245, 235, 0.82);
       }
@@ -575,6 +686,7 @@
             <div class="home-buttons">
               <button id="startBtn" class="primary-btn">TIGRE</button>
               <button id="importBtn" class="secondary-btn">Galerie</button>
+              <button id="prestigeBtn" class="ghost-btn span-2">Prestiges</button>
             </div>
             <div id="errorBox" class="error-box hidden"></div>
           </div>
@@ -647,6 +759,65 @@
             <p class="tiny save-note">Sur mobile, ça ouvre le partage ou télécharge l'image du résultat.</p>
           </div>
         </section>
+
+        <section id="prestigeScreen" class="screen prestige-screen">
+          <div class="prestige-top">
+            <div class="pill">🏆 Prestiges</div>
+            <div class="prestige-box section-stack" style="gap: 12px">
+              <div>
+                <h2 style="font-size: 28px">Collection tigresque</h2>
+                <p id="prestigeSummaryText" class="muted small" style="margin-top: 8px">
+                  Débloque un maximum de noms pour remplir la collection complète.
+                </p>
+              </div>
+              <div class="prestige-stats">
+                <div class="prestige-stat">
+                  <span id="prestigeOwned" class="prestige-value">0</span>
+                  <span class="prestige-label">obtenus</span>
+                </div>
+                <div class="prestige-stat">
+                  <span id="prestigeTotal" class="prestige-value">0</span>
+                  <span class="prestige-label">au total</span>
+                </div>
+                <div class="prestige-stat">
+                  <span id="prestigeMissing" class="prestige-value">0</span>
+                  <span class="prestige-label">manquants</span>
+                </div>
+              </div>
+              <div class="progress-shell">
+                <div id="prestigeBar" class="progress-fill"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="section-stack" style="flex: 1; min-height: 0">
+            <div class="prestige-list-head">
+              <span>Noms déjà obtenus</span>
+              <span id="prestigeMissingLabel" class="tiny muted">Il t'en manque encore…</span>
+            </div>
+            <div id="prestigeList" class="prestige-list"></div>
+          </div>
+
+          <div id="unlockBox" class="unlock-box hidden section-stack" style="gap: 10px">
+            <div>
+              <div class="eyebrow">Récompense ultime</div>
+              <p style="font-size: 22px; font-weight: 900; margin-top: 6px">Diplôme débloqué</p>
+              <p class="muted small" style="margin-top: 6px">
+                Tu as tout obtenu. Prends une photo ou importe-en une, puis télécharge le diplôme officiel « Tié un tigre ».
+              </p>
+            </div>
+            <button id="diplomaBtn" class="primary-btn" style="font-size: 16px">Télécharger le diplôme</button>
+          </div>
+
+          <p id="prestigeNote" class="tiny prestige-note">
+            Le diplôme se débloque uniquement quand toute la collection est complétée.
+          </p>
+
+          <div class="actions-2">
+            <button id="prestigeBackBtn" class="secondary-btn">Accueil</button>
+            <button id="prestigeRefreshBtn" class="ghost-btn">Actualiser</button>
+          </div>
+        </section>
       </div>
 
       <input id="galleryInput" type="file" accept="image/*,video/*" class="hidden" />
@@ -657,133 +828,6 @@
     </div>
 
     <script>
-      const funnyCountries = [
-        "Franchistan de la raclette",
-        "Belgigolosse",
-        "Tigralie du barbecue cosmique",
-        "Mexicharrrd",
-        "Japongrrr Turbo",
-        "Canadoudou Prime",
-        "Brésilavion",
-        "Itapizza del tigro",
-        "Marocroc Max",
-        "Espagrriotte",
-        "Argentigroland",
-        "Indigrrrmédiaire",
-        "Turquouic",
-        "Chagrrovia",
-        "Portugrololo",
-        "Norvroum 2",
-        "Suissatory",
-        "Camerounch",
-        "Tunivroum",
-        "Algérrrizon",
-        "Tigrlande Édition Limitée",
-        "Sénégrawl Ultra",
-        "Croagrrre 4K",
-        "Hongrurie de la sauce",
-        "Finlande mais en plus tigre",
-        "Danemark Zuckerberg",
-        "Tanzanigrrre",
-        "Kenyarrrgh",
-        "Tigrafrique du Sud Deluxe",
-        "Pérougarou V2",
-        "Chilichat Pro Max",
-        "Bolitigre XP",
-        "Urugrrray Sigma",
-        "Paragrrray DLC",
-        "Colombraw Studio",
-        "Costagriffe Rica",
-        "Panamiaou Stories",
-        "Guatigrre Électrique",
-        "Vietgrrrrnam Director's Cut",
-        "Thaïtigre Supreme",
-        "Malaiscratch Hardcore",
-        "Indonégrrrsie Remix",
-        "Philigrrrines en WiFi",
-        "Corégrrr du Sud mais drôle",
-        "Tigrapour Business Class",
-        "Néozégrrrlande de l'aura",
-        "Groengrrrland chaud",
-        "Islandou Plus",
-        "Monacraw Prestige",
-        "Luxemburgrrr Premium",
-        "Autrichat.exe",
-        "Grecrouh Antique",
-        "Roumignou Turbo",
-        "Bulgrrrare de la night",
-        "Serbigrrre Academy",
-        "Tchétigrrre HD",
-        "Kazagrrrstan Drift",
-        "Mongrrrolie Mobile",
-        "Népalou Pocket",
-        "Bhoutigrrran Infinity",
-        "Sri Lankraw Gold",
-        "Madagrrrscar Origins",
-        "Nigrrria Battle Pass",
-        "Ghanagriffe",
-        "Bostigrrrwana Max",
-        "Namibraw Ultra",
-        "Ougrrranda Cinematic Universe",
-        "Ohio des tigres",
-        "Baguettistan Quantique",
-        "Croissantie Sauvage",
-        "Sardinavie Royale",
-        "Rizotto-sur-Grrr",
-        "Wakandou du dimanche",
-        "Molduvie du rugissement",
-        "Pamplemoussie Centrale",
-        "Chocotigrie",
-        "Macaronésie du Feu",
-        "Yapadekoi-les-Tigres",
-        "Tigristan de la Sieste",
-        "Dubaïe aïe aïe",
-        "Miamiland Supreme",
-        "Patatagonie",
-        "Ramenbourg",
-        "Sushiville Max",
-        "Tigrépublique du Chill",
-        "Sigma-sur-Mer",
-        "Chipslavie",
-        "Brolandia Premium",
-        "Biscottarie",
-        "Gaufrix",
-        "Croustiland",
-        "Nuggetonie",
-        "Bretzellerie Mystique",
-        "Pingouinie du Soleil",
-        "Dinosarie Administrative",
-        "Tartiflette Empire",
-        "Croutonistan",
-        "Bourguignator",
-        "Lasagnie Interdite",
-        "Moutardix",
-        "Fricadellistan",
-        "Pizzabama",
-        "Bananistan Ultra Plus",
-        "Gruyèrie Galactique",
-        "Rizland Deluxe",
-        "Churroslavie",
-        "Kebabolie des neiges",
-        "Boulgour City",
-        "Mayoland",
-        "Pesto Rico",
-        "Pailletia Prime",
-        "Kikoololie du Nord",
-        "Tigroumanie Deluxe",
-        "Carbonaristan",
-        "Flanbourg Alpha",
-        "Yolo-sur-Seine",
-        "Broscovie",
-        "Chimichurrivie",
-        "Mojitolie",
-        "Fromagérie Interstellaire",
-        "Croquettepolis",
-        "Cannelonia",
-        "Painauchocolatland",
-        "Chaussettie du Sud"
-      ];
-
       const specialTigerTypes = [
         { name: "Roi des Tigres", weight: 1, description: "Tu n'es plus dans la chaîne alimentaire, tu es dans les crédits de fin. Même les boss de fin te vouvoient.", badge: "Légende vivante", ultra: true },
         { name: "Tigre Golden Croissant RTX", weight: 6, description: "Brille comme un skin légendaire tombé à 3h du matin. Aura 200%, logique 0%, respect automatique.", badge: "Tigre spécial", ultra: false },
@@ -812,41 +856,102 @@
         { name: "Tigre Pasta La Vista", weight: 2, description: "Trop al dente pour cette dimension. Peut régler un conflit international avec une fourchette et un regard.", badge: "Tigre spécial", ultra: false },
         { name: "Tigre Réfrigérateur Sigma", weight: 2, description: "Froid, calme, éclairé de l'intérieur. Possède probablement la dernière boisson gazeuse du multivers.", badge: "Tigre spécial", ultra: false },
         { name: "Tigre Crocs en Mode Sport", weight: 2, description: "Absolument illégal visuellement, mais étrangement redoutable. La performance dépasse le bon goût.", badge: "Tigre spécial", ultra: false },
-        { name: "Tigre Bureaucratie Éternelle", weight: 1, description: "A besoin de trois tampons, deux signatures et d'un rugissement officiel pour entrer dans la légende.", badge: "Tigre spécial", ultra: false }
+        { name: "Tigre Bureaucratie Éternelle", weight: 1, description: "A besoin de trois tampons, deux signatures et d'un rugissement officiel pour entrer dans la légende.", badge: "Tigre spécial", ultra: false },
+        { name: "Tigre Parmesan de l'Apocalypse", weight: 2, description: "Saupoudre la terreur avec élégance. Personne n'a demandé, tout le monde applaudit.", badge: "Tigre spécial", ultra: false },
+        { name: "Tigre Laser de la Cantine", weight: 2, description: "Traverse le self comme un héros d'anime sous caféine. Les compotes s'écartent sur son passage.", badge: "Tigre spécial", ultra: false }
+      ];
+
+      const normalPrefixes = [
+        "Tigre Turbo", "Tigre Sigma", "Tigre Croustillant", "Tigre Royal", "Tigre Interdit", "Tigre Quantique", "Tigre Deluxe", "Tigre Administratif", "Tigre Nébuleux", "Tigre WiFi", "Tigre Croquant", "Tigre Cataclysmique", "Tigre Frost", "Tigre Chaotique", "Tigre Premium", "Tigre des Ombres", "Tigre Pailleté", "Tigre du Dimanche", "Tigre Ultra", "Tigre Capybara"
+      ];
+      const normalMiddles = [
+        "de la Sauce", "du Multivers", "de la Sieste", "du Frigo", "de l'Aura", "du Rugissement", "des Nuggets", "des Étoiles", "de la Night", "de l'Ohio", "du Boulgour", "de l'Apocalypse", "du Pesto", "de la Foudre", "du Kebab", "du WiFi 6", "du Brouillard", "de la Tartiflette", "de la Panique", "du Métavers"
+      ];
+      const normalSuffixes = [
+        "Suprême", "Prime", "Version 2", "Pro Max", "Édition Nuit", "Ultra Rare", "sans DLC", "4K HDR", "non homologué", "du Turfu"
       ];
 
       const countrySubtitles = [
-        "Espèce locale officiellement approuvée par un comité composé de trois cousins, un streamer et une frite froide.",
         "Ton aura a été validée par la jungle, par internet, et par un gars en commentaire qui a écrit 'masterclass'.",
-        "Tu as l'énergie d'un héros secondaire devenu principal par accident, et franchement ça fonctionne trop bien.",
-        "Le scanner hésitait entre 'animal mythique' et 'mème national'. Il a choisi les deux sans demander d'autorisation.",
+        "Le scanner hésitait entre animal mythique et mème national. Il a choisi les deux.",
         "Niveau de rugissement : assez élevé pour faire quitter la partie à un lobby entier sur Warzone.",
         "Tu dégages une vibe de boss caché qu'on rencontre après avoir cliqué sur un bouton qui n'existait même pas.",
         "Présence certifiée 4K HDR Dolby Rugissement. Les voisins ont probablement entendu le charisme passer.",
-        "Le système te classe entre 'icône locale', 'légende incomprise' et 'type qui arrive avec une musique d'entrée'.",
-        "Tu as une aura de mème rare trouvé à 2h17, drôle sans raison, et impossible à expliquer à des adultes responsables.",
-        "Ce résultat n'a aucun sens scientifique, mais énormément de sens émotionnel. Et parfois c'est encore plus fort.",
-        "Le scanner a noté 'énorme potentiel de montage edit avec flammes, yeux brillants et texte sigma'.",
-        "Tu respires l'énergie d'un personnage qui dit 't'inquiète' puis fait exactement l'inverse, mais avec style.",
-        "Validation totale. Même un type sur Discord aurait répondu 'frère c'est clairement un tigre'.",
+        "Tu as une aura de mème rare trouvé à 2h17, drôle sans raison et impossible à expliquer à des adultes responsables.",
+        "Le scanner a noté énorme potentiel de montage edit avec flammes, yeux brillants et texte sigma.",
         "On dirait le genre de tigre qui lancerait un business en ligne depuis la jungle et réussirait quand même.",
-        "Ta présence rappelle un mème oublié de 2021 qui revient soudainement et redevient hilarant sans explication.",
         "Le conseil des anciens a vu ta photo et a simplement dit 'ah ouais lui il est problématique en 1v1'.",
-        "Tu as l'énergie d'un personnage qui spawn avec une musique drill sans que personne n'ait branché d'enceinte.",
-        "Les statistiques sont confuses, les scientifiques sont partis, mais la vibe générale crie très fort 'tigre confirmé'.",
-        "Tu inspires la même peur respectueuse qu'un message 'on peut parler ?' envoyé à 23h48.",
-        "On raconte que ce genre de tigre peut ouvrir un frigo, fixer une compote, et gagner quand même le débat.",
-        "Le scan a détecté une quantité dangereuse d'aura, de sauce et de menace passive. C'est magnifique.",
-        "Résultat ultra crédible si on accepte que les lois de la physique soient remplacées par les commentaires TikTok.",
-        "Tu as été classé dans la catégorie 'très sérieux extérieurement, complètement absurde intérieurement'.",
-        "Même le bouton OK a hésité avant de confirmer un niveau pareil. C'est dire la gravité de la situation.",
-        "Franchement, on dirait un tigre qui aurait une intro YouTube en flammes, un pseudo imprononçable et 200 000 abonnés.",
-        "Tu as une présence de mème interdit dans un groupe de famille, mais avec suffisamment de charisme pour qu'on te pardonne.",
-        "Selon le scanner, tu pourrais probablement gagner une dispute contre une notice Ikea et un stagiaire en même temps.",
-        "L'énergie détectée correspond à un individu capable de manger des nuggets froids et de rester quand même iconique.",
-        "Le résultat est certifié par un laboratoire très douteux, mais l'ambiance est tellement forte qu'on le valide quand même.",
-        "Tu dégages la vibe d'un personnage qui répond 'léger' après avoir causé un chaos irréversible."
+        "Tu inspires la même peur respectueuse qu'un message 'on peut parler ?' envoyé à 23h48."
       ];
+
+      const descriptionOpeners = [
+        "Le scanner a paniqué puis a validé.",
+        "Les experts n'ont pas compris, mais ils ont applaudi.",
+        "Le résultat est illégal dans 14 dimensions.",
+        "La jungle a envoyé un mail de félicitations.",
+        "Même le bouton OK a hésité avant d'accepter ce niveau.",
+        "Le radar à charisme a pris feu en douceur.",
+        "Les statistiques ont quitté la conversation.",
+        "Un ancien du village a soufflé 'ah ouais quand même'.",
+        "Le serveur a lagué en découvrant ton aura.",
+        "Le scan vient officiellement d'ouvrir un débat familial."
+      ];
+      const descriptionMiddles = [
+        "Tu dégages l'énergie d'un boss caché qu'on débloque après avoir cliqué trois fois sur une banane.",
+        "Tu as la vibe d'un personnage secondaire devenu légende sans prévenir personne.",
+        "Ton niveau de sauce est trop élevé pour un navigateur classique.",
+        "On dirait un montage TikTok avec flammes, zoom, ralenti et texte sigma partout.",
+        "Même un groupe Discord entier aurait répondu 'frère c'est trop un tigre'.",
+        "Tu inspires le respect étrange qu'on ressent face à un frigo plein et un plan qui marche vraiment.",
+        "Tu respires la puissance d'un mème qu'on ne comprend pas mais qu'on partage quand même.",
+        "Tu as l'aura d'un PNJ qui cache une quête légendaire derrière une blague nulle.",
+        "Ton charisme est calibré entre masterclass, catastrophe et génie culinaire.",
+        "Tu sembles capable de gagner une dispute contre une notice Ikea et la météo en même temps."
+      ];
+      const descriptionEndings = [
+        "Très inquiétant, très propre.",
+        "Personne ne sait pourquoi, mais tout le monde respecte.",
+        "C'est absurde, donc c'est forcément vrai.",
+        "Le lore est flou, la puissance est nette.",
+        "On valide sans demander plus d'explications.",
+        "Même les voisins ont probablement senti le rugissement.",
+        "Ça n'a aucun sens scientifique et énormément de sens spirituel.",
+        "Le multivers te doit désormais un peu d'argent.",
+        "Tu pourrais probablement lancer un empire depuis une cafétéria.",
+        "Franchement, c'est une masterclass sous stéroïdes narratifs."
+      ];
+      const specialExtras = [
+        "Même les boss de fin te laissent passer devant par politesse.",
+        "Ton aura vient d'être signalée par trois applications météo.",
+        "On raconte déjà ton lore dans des commentaires YouTube très douteux.",
+        "Le niveau est si absurde qu'il devrait être taxé.",
+        "Tu pourrais probablement invoquer une intro CapCut juste en clignant des yeux.",
+        "Le scanner recommande de rester humble, mais il sait que tu ne vas pas écouter.",
+        "Des gens ont entendu le résultat et ont immédiatement ouvert leurs notes pour écrire une légende.",
+        "La jungle a demandé un autographe puis un tuto.",
+        "Ton charisme vient d'obtenir une mise à jour non documentée.",
+        "Même l'algorithme a dit 'ok là c'est trop'."
+      ];
+
+      function getRandomItem(list) {
+        return list[Math.floor(Math.random() * list.length)];
+      }
+
+      function buildNormalTigerCatalog() {
+        const names = [];
+        for (const prefix of normalPrefixes) {
+          for (const middle of normalMiddles) {
+            for (const suffix of normalSuffixes) {
+              names.push(prefix + " " + middle + " " + suffix);
+              if (names.length >= 200) return names;
+            }
+          }
+        }
+        return names;
+      }
+
+      const normalTigerCatalog = buildNormalTigerCatalog();
+      const allTigerNames = [...normalTigerCatalog, ...specialTigerTypes.map((item) => item.name)];
 
       const state = {
         facingMode: "environment",
@@ -854,14 +959,16 @@
         capturedImage: "",
         audioPrimed: false,
         lastResult: null,
-        attemptCount: Number(localStorage.getItem("tigre_attempt_count") || "0")
+        attemptCount: Number(localStorage.getItem("tigre_attempt_count") || "0"),
+        collection: new Set(JSON.parse(localStorage.getItem("tigre_collection") || "[]").filter((name) => allTigerNames.includes(name)))
       };
 
       const screens = {
         home: document.getElementById("homeScreen"),
         camera: document.getElementById("cameraScreen"),
         analyzing: document.getElementById("analyzingScreen"),
-        result: document.getElementById("resultScreen")
+        result: document.getElementById("resultScreen"),
+        prestige: document.getElementById("prestigeScreen")
       };
 
       const brandLogo = document.getElementById("brandLogo");
@@ -887,6 +994,16 @@
       const specialCardEyebrow = document.getElementById("specialCardEyebrow");
       const specialCardTitle = document.getElementById("specialCardTitle");
       const resultSound = document.getElementById("resultSound");
+      const prestigeOwned = document.getElementById("prestigeOwned");
+      const prestigeTotal = document.getElementById("prestigeTotal");
+      const prestigeMissing = document.getElementById("prestigeMissing");
+      const prestigeBar = document.getElementById("prestigeBar");
+      const prestigeList = document.getElementById("prestigeList");
+      const prestigeMissingLabel = document.getElementById("prestigeMissingLabel");
+      const prestigeSummaryText = document.getElementById("prestigeSummaryText");
+      const unlockBox = document.getElementById("unlockBox");
+      const diplomaBtn = document.getElementById("diplomaBtn");
+      const prestigeNote = document.getElementById("prestigeNote");
 
       document.getElementById("startBtn").addEventListener("click", () => startCamera());
       document.getElementById("importBtn").addEventListener("click", () => {
@@ -894,11 +1011,15 @@
         galleryInput.value = "";
         galleryInput.click();
       });
+      document.getElementById("prestigeBtn").addEventListener("click", openPrestiges);
       document.getElementById("backBtn").addEventListener("click", resetAll);
       okAnalyzeBtn.addEventListener("click", takePhoto);
       document.getElementById("retryBtn").addEventListener("click", () => startCamera());
       document.getElementById("homeBtn").addEventListener("click", resetAll);
       document.getElementById("saveBtn").addEventListener("click", saveScoreImage);
+      document.getElementById("prestigeBackBtn").addEventListener("click", resetAll);
+      document.getElementById("prestigeRefreshBtn").addEventListener("click", renderPrestiges);
+      diplomaBtn.addEventListener("click", downloadDiploma);
       galleryInput.addEventListener("change", handleGallerySelection);
 
       let lastCameraTap = 0;
@@ -943,8 +1064,69 @@
         errorBox.textContent = message;
       }
 
-      function getRandomItem(list) {
-        return list[Math.floor(Math.random() * list.length)];
+      function persistCollection() {
+        localStorage.setItem("tigre_collection", JSON.stringify(Array.from(state.collection)));
+      }
+
+      function registerTigerName(name) {
+        if (!name) return;
+        state.collection.add(name);
+        persistCollection();
+      }
+
+      function openPrestiges() {
+        renderPrestiges();
+        showScreen("prestige");
+      }
+
+      function renderPrestiges() {
+        const obtainedNames = Array.from(state.collection).filter((name) => allTigerNames.includes(name)).sort((a, b) => a.localeCompare(b, "fr"));
+        const owned = obtainedNames.length;
+        const total = allTigerNames.length;
+        const missing = Math.max(total - owned, 0);
+        const progress = total ? Math.round((owned / total) * 100) : 0;
+
+        prestigeOwned.textContent = String(owned);
+        prestigeTotal.textContent = String(total);
+        prestigeMissing.textContent = String(missing);
+        prestigeBar.style.width = progress + "%";
+        prestigeSummaryText.textContent = owned === 0
+          ? "Aucun nom débloqué pour l'instant. Lance quelques scans pour commencer la collection."
+          : "Tu as déjà débloqué " + owned + " nom" + (owned > 1 ? "s" : "") + ". Continue pour remplir la collection complète et débloquer le diplôme final.";
+        prestigeMissingLabel.textContent = missing === 0 ? "Collection complète" : "Il t'en manque " + missing;
+
+        prestigeList.innerHTML = "";
+        if (!obtainedNames.length) {
+          const emptyChip = document.createElement("div");
+          emptyChip.className = "locked-chip";
+          emptyChip.textContent = "Aucun nom débloqué pour le moment";
+          prestigeList.appendChild(emptyChip);
+        } else {
+          obtainedNames.forEach((name) => {
+            const chip = document.createElement("div");
+            chip.className = "prestige-chip";
+            chip.textContent = name;
+            prestigeList.appendChild(chip);
+          });
+        }
+
+        if (missing > 0) {
+          const teaserCount = Math.min(8, missing);
+          for (let i = 0; i < teaserCount; i += 1) {
+            const lock = document.createElement("div");
+            lock.className = "locked-chip";
+            lock.textContent = "??? tigre mystère";
+            prestigeList.appendChild(lock);
+          }
+        }
+
+        const unlocked = missing === 0;
+        unlockBox.classList.toggle("hidden", !unlocked);
+        diplomaBtn.classList.toggle("disabled-btn", !unlocked);
+        diplomaBtn.disabled = !unlocked;
+        prestigeNote.textContent = unlocked
+          ? "Le diplôme est débloqué. Il te faut simplement une photo récente dans l'app pour le générer."
+          : "Le diplôme se débloque uniquement quand toute la collection est complétée.";
       }
 
       function pickWeightedTiger(list) {
@@ -963,21 +1145,14 @@
           resultSound.muted = true;
           const playAttempt = resultSound.play();
           if (playAttempt && typeof playAttempt.then === "function") {
-            playAttempt
-              .then(() => {
-                resultSound.pause();
-                resultSound.currentTime = 0;
-                resultSound.muted = false;
-                state.audioPrimed = true;
-              })
-              .catch(() => {
-                resultSound.muted = false;
-              });
-          } else {
-            resultSound.pause();
-            resultSound.currentTime = 0;
-            resultSound.muted = false;
-            state.audioPrimed = true;
+            playAttempt.then(() => {
+              resultSound.pause();
+              resultSound.currentTime = 0;
+              resultSound.muted = false;
+              state.audioPrimed = true;
+            }).catch(() => {
+              resultSound.muted = false;
+            });
           }
         } catch (error) {
           resultSound.muted = false;
@@ -995,6 +1170,14 @@
         } catch (error) {}
       }
 
+      function buildDynamicDescription() {
+        return getRandomItem(descriptionOpeners) + " " + getRandomItem(descriptionMiddles) + " " + getRandomItem(descriptionEndings);
+      }
+
+      function buildSpecialDescription(baseDescription) {
+        return baseDescription + " " + getRandomItem(specialExtras);
+      }
+
       function pickTigerResult(attemptNumber) {
         const nonTigerChance = 0.06;
         if (Math.random() < nonTigerChance) {
@@ -1009,7 +1192,7 @@
         }
 
         const boostedAttempt = attemptNumber <= 3;
-        const specialChance = boostedAttempt ? 0.3 : 0.12;
+        const specialChance = boostedAttempt ? 0.3 : 0.14;
 
         if (Math.random() < specialChance) {
           const specialTiger = pickWeightedTiger(specialTigerTypes);
@@ -1019,19 +1202,20 @@
             ultra: Boolean(specialTiger.ultra),
             badge: specialTiger.badge,
             title: "Tié un " + specialTiger.name,
-            subtitle: specialTiger.description,
-            boosted: boostedAttempt
+            subtitle: buildSpecialDescription(specialTiger.description),
+            catalogName: specialTiger.name
           };
         }
 
-        const country = getRandomItem(funnyCountries);
+        const normalName = getRandomItem(normalTigerCatalog);
         return {
           isTiger: true,
           special: false,
           ultra: false,
           badge: "Tigre certifié",
-          title: "Tié un tigre du " + country,
-          subtitle: getRandomItem(countrySubtitles)
+          title: "Tié un " + normalName,
+          subtitle: getRandomItem(countrySubtitles) + " " + buildDynamicDescription(),
+          catalogName: normalName
         };
       }
 
@@ -1057,16 +1241,12 @@
 
           state.stream = stream;
           const videoTrack = stream.getVideoTracks()[0];
-
           try {
             const capabilities = videoTrack.getCapabilities ? videoTrack.getCapabilities() : null;
             const advanced = [];
-
             if (capabilities && capabilities.width && capabilities.width.max) advanced.push({ width: capabilities.width.max });
             if (capabilities && capabilities.height && capabilities.height.max) advanced.push({ height: capabilities.height.max });
             if (capabilities && capabilities.focusMode && capabilities.focusMode.includes("continuous")) advanced.push({ focusMode: "continuous" });
-            if (capabilities && capabilities.resizeMode && capabilities.resizeMode.includes("none")) advanced.push({ resizeMode: "none" });
-
             if (advanced.length) await videoTrack.applyConstraints({ advanced });
           } catch (error) {}
 
@@ -1123,19 +1303,16 @@
       async function processImportedFile(file) {
         stopCamera();
         setError("");
-
         if (file.type.startsWith("image/")) {
           const imageData = await fileToImageData(file);
           runAnalysisFromImage(imageData);
           return;
         }
-
         if (file.type.startsWith("video/")) {
           const frameData = await videoFileToFrame(file);
           runAnalysisFromImage(frameData);
           return;
         }
-
         throw new Error("Unsupported file type");
       }
 
@@ -1191,7 +1368,6 @@
               cleanup();
               resolve(data);
             };
-
             importVideo.currentTime = Number.isFinite(targetTime) ? targetTime : 0.1;
             importVideo.onseeked = doCapture;
           };
@@ -1213,10 +1389,10 @@
         localStorage.setItem("tigre_attempt_count", String(nextAttempt));
 
         showScreen("analyzing");
-
         window.setTimeout(() => {
           const result = pickTigerResult(nextAttempt);
           state.lastResult = result;
+          if (result.isTiger && result.catalogName) registerTigerName(result.catalogName);
           renderResult(result);
           showScreen("result");
         }, 1400);
@@ -1250,7 +1426,6 @@
         resultBadge.textContent = result.badge;
         resultTitle.textContent = result.title;
         resultSubtitle.textContent = result.subtitle;
-
         resetResultVisuals();
 
         if (!result.special) {
@@ -1305,35 +1480,30 @@
       function wrapText(ctx, text, x, y, maxWidth, lineHeight, maxLines) {
         const words = text.split(" ");
         let line = "";
-        let lineCount = 0;
-
+        let lines = 0;
         for (let n = 0; n < words.length; n += 1) {
           const testLine = line + words[n] + " ";
-          const metrics = ctx.measureText(testLine);
-          if (metrics.width > maxWidth && n > 0) {
+          if (ctx.measureText(testLine).width > maxWidth && n > 0) {
             ctx.fillText(line.trim(), x, y);
             line = words[n] + " ";
             y += lineHeight;
-            lineCount += 1;
-            if (lineCount >= maxLines - 1) break;
+            lines += 1;
+            if (lines >= maxLines - 1) break;
           } else {
             line = testLine;
           }
         }
-
         ctx.fillText(line.trim(), x, y);
       }
 
       async function buildScoreBlob() {
         if (!state.capturedImage || !state.lastResult) throw new Error("No result available");
-
         const img = await loadImage(state.capturedImage);
         const result = state.lastResult;
         const width = 1080;
         const height = 1920;
         shareCanvas.width = width;
         shareCanvas.height = height;
-
         const ctx = shareCanvas.getContext("2d");
         const gradient = ctx.createLinearGradient(0, 0, 0, height);
         gradient.addColorStop(0, "#ffcf88");
@@ -1341,17 +1511,14 @@
         gradient.addColorStop(1, "#e66900");
         ctx.fillStyle = gradient;
         ctx.fillRect(0, 0, width, height);
-
         ctx.fillStyle = "rgba(255,255,255,0.18)";
         roundedRect(ctx, 70, 70, 940, 1780, 42);
         ctx.fill();
-
         ctx.fillStyle = "rgba(255,255,255,0.95)";
         ctx.font = "700 34px Inter, sans-serif";
         ctx.fillText("SCANNER FÉLIN", 160, 160);
         ctx.font = "900 88px Inter, sans-serif";
         ctx.fillText("TIGRE", 160, 250);
-
         ctx.save();
         roundedRect(ctx, 90, 310, 900, 1020, 40);
         ctx.clip();
@@ -1362,27 +1529,21 @@
         const dy = 310 + (1020 - drawHeight) / 2;
         ctx.drawImage(img, dx, dy, drawWidth, drawHeight);
         ctx.restore();
-
         ctx.fillStyle = "rgba(255,255,255,0.17)";
         roundedRect(ctx, 90, 1370, 900, 380, 36);
         ctx.fill();
-
         ctx.fillStyle = "rgba(255,255,255,0.92)";
         ctx.font = "800 32px Inter, sans-serif";
         ctx.fillText(result.badge.toUpperCase(), 130, 1450);
-
         ctx.fillStyle = "#ffffff";
         ctx.font = "900 66px Inter, sans-serif";
         wrapText(ctx, result.title, 130, 1545, 820, 80, 3);
-
         ctx.fillStyle = "rgba(255,245,235,0.96)";
         ctx.font = "500 34px Inter, sans-serif";
         wrapText(ctx, result.subtitle, 130, 1715, 820, 48, 4);
-
         ctx.fillStyle = "rgba(255,255,255,0.86)";
         ctx.font = "700 28px Inter, sans-serif";
         ctx.fillText("ti-untigre • score officiel non homologué", 130, 1820);
-
         return await new Promise((resolve, reject) => {
           shareCanvas.toBlob((blob) => {
             if (!blob) {
@@ -1396,20 +1557,13 @@
 
       async function saveScoreImage() {
         if (!state.lastResult) return;
-
         try {
           const blob = await buildScoreBlob();
           const file = new File([blob], "tigre-score.png", { type: "image/png" });
-
           if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-            await navigator.share({
-              title: "Mon score TIGRE",
-              text: state.lastResult.title,
-              files: [file]
-            });
+            await navigator.share({ title: "Mon score TIGRE", text: state.lastResult.title, files: [file] });
             return;
           }
-
           const url = URL.createObjectURL(blob);
           const link = document.createElement("a");
           link.href = url;
@@ -1421,12 +1575,198 @@
         } catch (error) {}
       }
 
+      async function buildDiplomaBlob() {
+        if (!state.capturedImage) throw new Error("No photo available");
+        const owned = state.collection.size;
+        const total = allTigerNames.length;
+        if (owned < total) throw new Error("Not unlocked");
+
+        const photo = await loadImage(state.capturedImage);
+        const width = 1800;
+        const height = 1300;
+        shareCanvas.width = width;
+        shareCanvas.height = height;
+        const ctx = shareCanvas.getContext("2d");
+
+        ctx.fillStyle = "#f1dfb6";
+        ctx.fillRect(0, 0, width, height);
+
+        const paperNoise = ctx.createLinearGradient(0, 0, width, height);
+        paperNoise.addColorStop(0, "rgba(255,248,231,0.88)");
+        paperNoise.addColorStop(1, "rgba(235,213,160,0.92)");
+        ctx.fillStyle = paperNoise;
+        roundedRect(ctx, 34, 34, width - 68, height - 68, 8);
+        ctx.fill();
+
+        ctx.lineWidth = 22;
+        ctx.strokeStyle = "#2f2216";
+        ctx.strokeRect(34, 34, width - 68, height - 68);
+        ctx.lineWidth = 14;
+        ctx.strokeStyle = "#df7a00";
+        ctx.strokeRect(60, 60, width - 120, height - 120);
+
+        for (let x = 60; x < width - 60; x += 70) {
+          ctx.fillStyle = x % 140 === 0 ? "#1e140e" : "#df7a00";
+          ctx.beginPath();
+          ctx.moveTo(x, 60);
+          ctx.lineTo(x + 44, 60);
+          ctx.lineTo(x + 32, 94);
+          ctx.lineTo(x - 12, 94);
+          ctx.closePath();
+          ctx.fill();
+
+          ctx.beginPath();
+          ctx.moveTo(x, height - 60);
+          ctx.lineTo(x + 44, height - 60);
+          ctx.lineTo(x + 32, height - 94);
+          ctx.lineTo(x - 12, height - 94);
+          ctx.closePath();
+          ctx.fill();
+        }
+
+        for (let y = 60; y < height - 60; y += 70) {
+          ctx.fillStyle = y % 140 === 0 ? "#1e140e" : "#df7a00";
+          ctx.beginPath();
+          ctx.moveTo(60, y);
+          ctx.lineTo(94, y + 12);
+          ctx.lineTo(94, y + 56);
+          ctx.lineTo(60, y + 44);
+          ctx.closePath();
+          ctx.fill();
+
+          ctx.beginPath();
+          ctx.moveTo(width - 60, y);
+          ctx.lineTo(width - 94, y + 12);
+          ctx.lineTo(width - 94, y + 56);
+          ctx.lineTo(width - 60, y + 44);
+          ctx.closePath();
+          ctx.fill();
+        }
+
+        ctx.fillStyle = "#1d140e";
+        ctx.font = "700 60px Georgia, serif";
+        ctx.textAlign = "center";
+        ctx.fillText("DIPLÔME D'HONNEUR", width / 2, 220);
+
+        ctx.font = "900 170px Georgia, serif";
+        ctx.fillStyle = "#1a100a";
+        ctx.fillText("TIÉ UN TIGRE", width / 2 + 8, 410);
+        ctx.fillStyle = "#ff9800";
+        ctx.fillText("TIÉ UN TIGRE", width / 2, 396);
+
+        ctx.font = "italic 64px Georgia, serif";
+        ctx.fillStyle = "#352418";
+        ctx.fillText("En reconnaissance de votre férocité", width / 2, 520);
+        ctx.fillText("et de votre courage exceptionnel.", width / 2, 595);
+
+        const photoX = 170;
+        const photoY = 650;
+        const photoW = 370;
+        const photoH = 420;
+        ctx.fillStyle = "rgba(20, 12, 8, 0.18)";
+        roundedRect(ctx, photoX - 16, photoY - 16, photoW + 32, photoH + 32, 24);
+        ctx.fill();
+        ctx.save();
+        roundedRect(ctx, photoX, photoY, photoW, photoH, 24);
+        ctx.clip();
+        const ratio = Math.max(photoW / photo.width, photoH / photo.height);
+        const drawWidth = photo.width * ratio;
+        const drawHeight = photo.height * ratio;
+        const dx = photoX + (photoW - drawWidth) / 2;
+        const dy = photoY + (photoH - drawHeight) / 2;
+        ctx.drawImage(photo, dx, dy, drawWidth, drawHeight);
+        ctx.restore();
+        ctx.lineWidth = 8;
+        ctx.strokeStyle = "#8b5b18";
+        roundedRect(ctx, photoX, photoY, photoW, photoH, 24);
+        ctx.stroke();
+
+        ctx.textAlign = "left";
+        ctx.fillStyle = "#2b1c12";
+        ctx.font = "italic 64px Georgia, serif";
+        ctx.fillText("Décerné à :", 620, 740);
+        ctx.fillRect(930, 730, 560, 3);
+        ctx.font = "italic 54px Georgia, serif";
+        ctx.fillText("En ce jour :", 620, 845);
+        ctx.fillRect(900, 835, 350, 3);
+        ctx.font = "600 40px Georgia, serif";
+        ctx.fillText(new Intl.DateTimeFormat("fr-FR", { day: "2-digit", month: "long", year: "numeric" }).format(new Date()), 915, 823);
+
+        ctx.font = "700 44px Georgia, serif";
+        wrapText(ctx, state.lastResult ? state.lastResult.title : "Tié un tigre", 620, 950, 800, 54, 3);
+        ctx.font = "italic 36px Georgia, serif";
+        wrapText(ctx, state.lastResult ? state.lastResult.subtitle : "Collection complète validée par le Comité Suprême des Tigres.", 620, 1070, 800, 44, 4);
+
+        ctx.textAlign = "center";
+        ctx.fillStyle = "#d38a00";
+        ctx.beginPath();
+        ctx.arc(width / 2, 1120, 104, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = "#24180f";
+        ctx.beginPath();
+        ctx.arc(width / 2, 1120, 82, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = "#ff9800";
+        ctx.font = "900 78px serif";
+        ctx.fillText("🐯", width / 2, 1148);
+        ctx.font = "700 28px Georgia, serif";
+        ctx.fillStyle = "#2b1c12";
+        ctx.fillText("CERTIFICAT DE BRAVOURE", width / 2, 1250);
+
+        ctx.textAlign = "left";
+        ctx.font = "italic 74px cursive";
+        ctx.fillStyle = "#1a100a";
+        ctx.fillText("Maurice Dupont", 180, 1130);
+        ctx.fillRect(160, 1145, 430, 2);
+        ctx.font = "600 34px Georgia, serif";
+        ctx.fillText("Président du Comité", 220, 1195);
+
+        ctx.textAlign = "right";
+        ctx.font = "italic 74px cursive";
+        ctx.fillText("Jacqueline Martin", 1610, 1130);
+        ctx.fillRect(1210, 1145, 430, 2);
+        ctx.font = "600 34px Georgia, serif";
+        ctx.fillText("Secrétaire Générale", 1570, 1195);
+
+        return await new Promise((resolve, reject) => {
+          shareCanvas.toBlob((blob) => {
+            if (!blob) {
+              reject(new Error("Blob unavailable"));
+              return;
+            }
+            resolve(blob);
+          }, "image/png");
+        });
+      }
+
+      async function downloadDiploma() {
+        try {
+          const blob = await buildDiplomaBlob();
+          const file = new File([blob], "diplome-tigre.png", { type: "image/png" });
+          if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+            await navigator.share({ title: "Mon diplôme Tié un Tigre", text: "Diplôme officiel Tié un Tigre", files: [file] });
+            return;
+          }
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement("a");
+          link.href = url;
+          link.download = "diplome-tigre.png";
+          document.body.appendChild(link);
+          link.click();
+          link.remove();
+          setTimeout(() => URL.revokeObjectURL(url), 1000);
+        } catch (error) {
+          prestigeNote.textContent = "Pour générer le diplôme, il faut avoir toute la collection ET une photo récente dans l'app.";
+        }
+      }
+
       function resetAll() {
         stopCamera();
         setError("");
         showScreen("home");
       }
 
+      renderPrestiges();
       window.addEventListener("beforeunload", stopCamera);
     </script>
   </body>
