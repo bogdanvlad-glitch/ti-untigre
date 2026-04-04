@@ -297,9 +297,10 @@
         top: 14px;
         left: 14px;
         right: 14px;
-        display: flex;
+        display: grid;
+        grid-template-columns: auto 1fr auto auto;
         align-items: center;
-        justify-content: space-between;
+        gap: 10px;
         z-index: 3;
       }
 
@@ -317,6 +318,18 @@
         color: white;
         font-size: 18px;
         backdrop-filter: blur(8px);
+      }
+
+      .switch-btn {
+        height: 46px;
+        padding: 0 16px;
+        border-radius: 999px;
+        background: rgba(0, 0, 0, 0.26);
+        color: white;
+        font-size: 14px;
+        font-weight: 900;
+        backdrop-filter: blur(8px);
+        justify-self: end;
       }
 
       .ok-btn {
@@ -718,6 +731,8 @@
               <video id="video" autoplay playsinline muted></video>
               <div class="camera-ui-top">
                 <button id="backBtn" class="back-overlay-btn camera-control" aria-label="Retour">↺</button>
+                <div></div>
+                <button id="switchBtn" class="switch-btn camera-control" aria-label="Retourner la caméra">Cam</button>
                 <button id="okAnalyzeBtn" class="ok-btn camera-control">OK</button>
               </div>
               <div class="camera-note">Cadre ton visage, puis appuie sur OK</div>
@@ -1041,6 +1056,7 @@
       });
       document.getElementById("prestigeBtn").addEventListener("click", openPrestiges);
       document.getElementById("backBtn").addEventListener("click", resetAll);
+      document.getElementById("switchBtn").addEventListener("click", switchCamera);
       okAnalyzeBtn.addEventListener("click", takePhoto);
       document.getElementById("retryBtn").addEventListener("click", () => startCamera());
       document.getElementById("homeBtn").addEventListener("click", resetAll);
