@@ -404,6 +404,21 @@
         animation: glowImage 2.2s ease-in-out infinite;
       }
 
+      #resultScreen,
+      #resultImage,
+      .result-image-wrap,
+      #specialOverlay {
+        -webkit-user-select: none;
+        user-select: none;
+        -webkit-touch-callout: none;
+      }
+
+      #resultImage,
+      #specialOverlay {
+        pointer-events: none;
+        -webkit-user-drag: none;
+      }
+
       .special-overlay {
         position: absolute;
         inset: 0;
@@ -994,6 +1009,7 @@
       const specialCardEyebrow = document.getElementById("specialCardEyebrow");
       const specialCardTitle = document.getElementById("specialCardTitle");
       const resultSound = document.getElementById("resultSound");
+      const resultScreenEl = document.getElementById("resultScreen");
       const prestigeOwned = document.getElementById("prestigeOwned");
       const prestigeTotal = document.getElementById("prestigeTotal");
       const prestigeMissing = document.getElementById("prestigeMissing");
@@ -1006,6 +1022,18 @@
       const prestigeNote = document.getElementById("prestigeNote");
 
       document.getElementById("startBtn").addEventListener("click", () => startCamera());
+      resultScreenEl.addEventListener(
+        "pointerdown",
+        (event) => {
+          if (event.target.closest("button")) return;
+          event.preventDefault();
+          if (resultSound && resultSound.paused && !resultSound.ended) {
+            const playAttempt = resultSound.play();
+            if (playAttempt && typeof playAttempt.catch === "function") playAttempt.catch(() => {});
+          }
+        },
+        { passive: false }
+      );
       document.getElementById("importBtn").addEventListener("click", () => {
         primeAudio();
         galleryInput.value = "";
